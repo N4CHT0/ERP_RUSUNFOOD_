@@ -18,10 +18,12 @@ class Product extends Model
         'id_bahan_baku',
         'harga_produk',
         'mata_uang',
+        'foto_produk',
 
     ];
-    public function Material()
+
+    public function material()
     {
-        return $this->belongsTo(User::class, 'id_bahan_baku');
+        return $this->belongsTo(Material::class, 'id_bahan_baku');
     }
 }

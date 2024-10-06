@@ -3,16 +3,16 @@
     Buat Data Produk |
 @endsection
 @section('content')
-    <div class="row">
-        <div class="col-xxl">
-            <div class="card mb-4">
-                <div class="card-header d-flex align-items-center justify-content-between">
-                    <h5 class="mb-0">Produk</h5>
-                    <small class="text-muted float-end">Buat Data Produk</small>
-                </div>
-                <div class="card-body">
-                    <form method="POST" action="{{ route('Product.store') }}" enctype="multipart/form-data">
-                        @csrf
+    <form method="POST" action="{{ route('Product.store') }}" enctype="multipart/form-data">
+        @csrf
+        <div class="row">
+            <div class="col-xxl">
+                <div class="card mb-4">
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        <h5 class="mb-0">Produk</h5>
+                        <small class="text-muted float-end">Buat Data Produk</small>
+                    </div>
+                    <div class="card-body">
                         <div class="row mb-3">
                             <label class="col-sm-2 col-form-label" for="kode_produk">Kode Produk</label>
                             <div class="col-sm-10">
@@ -54,10 +54,9 @@
                                     <span id="id_bahan_baku" class="input-group-text"><i class="bx bx-box"></i></span>
                                     <select class="form-select" id="bahan_baku_select">
                                         <Option value="">Pilih Bahan Baku</Option>
-                                        <option value="1">Bahan Baku 1</option>
-                                        <option value="2">Bahan Baku 2</option>
-                                        <option value="3">Bahan Baku 3</option>
-                                        <!-- Tambahkan bahan baku lainnya sesuai kebutuhan -->
+                                        @foreach ($material as $item)
+                                            <option value="{{ $item->id }}">{{ $item->nama_bahan }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <!-- Badge Container -->
@@ -73,25 +72,46 @@
                             <div class="col-sm-10">
                                 <div class="input-group input-group-merge">
                                     <span class="input-group-text"><i class="bx bx-envelope"></i></span>
-                                    <input type="number" id="harga_produk" class="form-control"
-                                        placeholder="Harga Bahan Baku" name="harga_produk" />
+                                    <input type="number" id="harga_produk" class="form-control" placeholder="Harga Produk"
+                                        name="harga_produk" />
                                     <select class="form-select" name="mata_uang" id="mata_uang">
                                         <Option value="">Pilih Mata Uang</Option>
+                                        <Option value="Rp.">Rp.</Option>
                                     </select>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
 
+            <div class="col-xxl">
+                <div class="card mb-4">
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        <h5 class="mb-0">Produk</h5>
+                        <small class="text-muted float-end">Foto Produk</small>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <label class="col-sm-2 col-form-label" for="nama_produk">Foto Produk</label>
+                            <div class="col-sm-10">
+                                <div class="input-group input-group-merge">
+                                    <span id="foto_produk" class="input-group-text"><i class="bx bx-box"></i></span>
+                                    <input type="file" id="foto_produk" class="form-control" placeholder="Nama Produk"
+                                        name="foto_produk" />
+                                </div>
+                            </div>
+                        </div>
                         <div class="row justify-content-end">
                             <div class="col-sm-10">
                                 <button type="submit" class="btn btn-primary">Simpan</button>
                             </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </form>
 @endsection
 @section('script')
     <script>

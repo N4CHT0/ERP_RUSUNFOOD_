@@ -12,5 +12,6 @@ Route::get('/inventory/material/create', [MaterialController::class, 'create'])-
 Route::post('/inventory/material/', [MaterialController::class, 'store'])->name('Material.store');
 
 
-Route::get('/inventory/product/create', [ProductController::class, 'create'])->name('Product.create');
-Route::get('/inventory/product/', [ProductController::class, 'store'])->name('Product.store');
+Route::get('/product/create', [ProductController::class, 'create'])->name('Product.create');
+Route::post('/product/', [ProductController::class, 'store'])->name('Product.store');
+Route::get('/product/', [ProductController::class, 'index'])->name('Product.index');

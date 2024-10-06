@@ -1,0 +1,19 @@
+/* Animasi untuk ikon */
+.action-icon {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.action-icon:hover {
+    transform: rotate(90deg); /* Rotasi saat hover */
+    opacity: 1;
+}
+
+/* Animasi untuk dropdown */
+.dropdown-menu {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease; /* Hanya transisi opacity */
+}
+.dropdown-menu.show {
+    opacity: 1;
+    transform: translateY(0);
+}
