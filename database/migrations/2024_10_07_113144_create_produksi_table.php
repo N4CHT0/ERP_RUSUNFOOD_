@@ -18,8 +18,11 @@ return new class extends Migration
             $table->integer('jumlah_produksi');
             $table->string('kode_produksi');
             $table->integer('total');
-            $table->integer('mata_uang');
+            $table->string('mata_uang');
             $table->date('tanggal_produksi');
+            $table->date('tanggal_kadaluarsa');
+            $table->date('tanggal_selesai_produksi');
+            $table->date('berat_bersih');
             $table->timestamps();
         });
     }
