@@ -86,6 +86,27 @@
             </ul>
         </li>
 
+        <!-- Inventory -->
+        <li class="menu-item">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-layout"></i>
+                <div data-i18n="Layouts">Inventory</div>
+            </a>
+
+            <ul class="menu-sub">
+                <li class="menu-item">
+                    <a href="{{ route('Product.index') }}" class="menu-link">
+                        <div data-i18n="Without menu">Produk</div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="layouts-without-navbar.html" class="menu-link">
+                        <div data-i18n="Without navbar">Bill Of Material</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
         <!-- Produk -->
         <li class="menu-item {{ Route::currentRouteName() == 'Product.create' ? 'active' : '' }}">
             <a href="{{ route('Product.create') }}" class="menu-link">

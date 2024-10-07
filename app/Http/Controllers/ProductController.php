@@ -61,10 +61,10 @@ class ProductController extends Controller
         if ($request->hasFile($fieldName)) {
             $image = $request->file($fieldName);
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->storeAs('public/img', $imageName);
+            $image->storeAs('img', $imageName);
 
             if ($model && $model->$fieldName) {
-                Storage::delete('public/img/' . $model->$fieldName);
+                Storage::delete('img/' . $model->$fieldName);
             }
 
             $data[$fieldName] = $imageName;
@@ -81,7 +81,7 @@ class ProductController extends Controller
 
         foreach ($fileFields as $fieldName) {
             if ($data->$fieldName) {
-                Storage::delete('public/img/' . basename($data->$fieldName));
+                Storage::delete('img/' . basename($data->$fieldName));
             }
         }
     }
