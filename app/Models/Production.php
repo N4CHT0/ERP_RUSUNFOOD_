@@ -8,27 +8,23 @@ use Illuminate\Database\Eloquent\Model;
 class Production extends Model
 {
     use HasFactory;
+
     protected $table = 'produksi';
-    protected $primarykey = "id";
+    protected $primaryKey = "id"; // Ejaan yang benar untuk 'primaryKey'
     protected $fillable = [
-        'id',
         'id_produk',
-        'id_bahan_baku',
         'jumlah_produksi',
         'kode_produksi',
-        'total',
         'tanggal_produksi',
         'tanggal_kadaluarsa',
         'tanggal_selesai_produksi',
-        'mata_uang',
-        'berat_bersih',
-
+        'bahan_digunakan', // Bahan baku yang disimpan sebagai JSON
     ];
 
-    public function material()
-    {
-        return $this->belongsTo(Material::class, 'id_bahan_baku');
-    }
+    // Cast 'bahan_digunakan' sebagai array otomatis
+    protected $casts = [
+        'bahan_digunakan' => 'array', // Laravel otomatis akan decode JSON menjadi array
+    ];
 
     public function product()
     {

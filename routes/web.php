@@ -18,3 +18,5 @@ Route::post('/product/', [ProductController::class, 'store'])->name('Product.sto
 Route::get('/product/', [ProductController::class, 'index'])->name('Product.index');
 
 Route::get('/production/', [ProductionController::class, 'index'])->name('Production.index');
+Route::post('/production/', [ProductionController::class, 'store'])->name('Production.store');
+Route::get('/production/cetak-pdf/{id}', [ProductionController::class, 'cetakPDF'])->name('Production.cetakPDF');

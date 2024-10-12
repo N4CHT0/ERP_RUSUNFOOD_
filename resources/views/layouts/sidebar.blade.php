@@ -73,9 +73,14 @@
             </a>
 
             <ul class="menu-sub">
-                <li class="menu-item">
+                <li class="menu-item {{ Route::currentRouteName() == 'Product.index' ? 'active' : '' }}">
                     <a href="{{ route('Product.index') }}" class="menu-link">
                         <div data-i18n="Without menu">Daftar Produk</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ Route::currentRouteName() == 'Production.index' ? 'active' : '' }}">
+                    <a href="{{ route('Production.index') }}" class="menu-link">
+                        <div data-i18n="Without menu">BoM (Bill Of Material)</div>
                     </a>
                 </li>
             </ul>
@@ -88,21 +93,21 @@
                 <div data-i18n="Layouts">Manufaktur</div>
             </a>
 
-            <ul class="menu-sub">
-                <li class="menu-item">
-                    <a href="{{ route('Production.index') }}" class="menu-link">
-                        <div data-i18n="Without menu">Produksi</div>
-                    </a>
-                </li>
-            </ul>
+            {{-- <ul class="menu-sub">
+
+            </ul> --}}
         </li>
 
-        <!-- Inventory -->
+        <!-- Gudang -->
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-layout"></i>
                 <div data-i18n="Layouts">Gudang</div>
             </a>
+
+            {{-- <ul class="menu-sub">
+
+            </ul> --}}
         </li>
 
         <!-- Produk -->
