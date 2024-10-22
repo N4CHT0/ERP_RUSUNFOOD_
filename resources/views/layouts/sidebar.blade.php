@@ -93,9 +93,14 @@
                 <div data-i18n="Layouts">Manufaktur</div>
             </a>
 
-            {{-- <ul class="menu-sub">
+            <ul class="menu-sub">
+                <li class="menu-item {{ Route::currentRouteName() == 'Manufacture.index' ? 'active' : '' }}">
+                    <a href="{{ route('Manufacture.index') }}" class="menu-link">
+                        <div data-i18n="Without menu"> Manufacture Orders</div>
+                    </a>
+                </li>
 
-            </ul> --}}
+            </ul>
         </li>
 
         <!-- Gudang -->
