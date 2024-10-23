@@ -40,7 +40,7 @@
                                             </div>
                                         @endif
 
-                                        <!-- Alert yang akan muncul jika ada bahan baku yang kurang dari JavaScript -->
+                                        <!-- Alert jika ada bahan baku yang kurang -->
                                         <div id="alertBahanBaku" class="alert alert-danger alert-dismissible d-none"
                                             role="alert">
                                             Harap mengecek ketersediaan bahan baku pada bahan yang memiliki nilai berwarna
@@ -51,7 +51,7 @@
 
                                         <div class="row">
                                             <div class="col mb-3">
-                                                <label for="" class="form-label">Produk</label>
+                                                <label for="produk" class="form-label">Produk</label>
                                                 <select class="form-select" name="produk" id="produkSelect">
                                                     <option value="">Pilih Produk</option>
                                                     @foreach ($products as $item)
@@ -64,30 +64,30 @@
                                         </div>
                                         <div class="row g-2">
                                             <div class="col mb-3">
-                                                <label for="" class="form-label">Kode Manufaktur</label>
+                                                <label for="kode_manufaktur" class="form-label">Kode Manufaktur</label>
                                                 <input type="text" name="kode_manufaktur" class="form-control"
                                                     placeholder="Kode Manufaktur" required />
                                             </div>
                                             <div class="col mb-3">
-                                                <label for="" class="form-label">Jumlah</label>
+                                                <label for="jumlah" class="form-label">Jumlah</label>
                                                 <input type="number" name="jumlah" id="quantity" class="form-control"
                                                     placeholder="Jumlah" required value="1" min="1" />
                                             </div>
                                         </div>
                                         <div class="row g-2">
                                             <div class="col mb-3">
-                                                <label for="" class="form-label">Rencana Produksi</label>
+                                                <label for="rencana_produksi" class="form-label">Rencana Produksi</label>
                                                 <input type="date" name="rencana_produksi" class="form-control"
                                                     required />
                                             </div>
                                             <div class="col mb-3">
-                                                <label for="" class="form-label">Batas Produksi</label>
+                                                <label for="batas_produksi" class="form-label">Batas Produksi</label>
                                                 <input type="date" name="batas_produksi" class="form-control" required />
                                             </div>
                                         </div>
                                         <div class="row g-2">
                                             <div class="col mb-3">
-                                                <label for="" class="form-label">Perusahaan</label>
+                                                <label for="perusahaan" class="form-label">Perusahaan</label>
                                                 <input type="text" name="perusahaan" class="form-control"
                                                     placeholder="Perusahaan" required />
                                             </div>
@@ -95,7 +95,7 @@
                                         <!-- Select BoM -->
                                         <div class="row">
                                             <div class="col mb-3">
-                                                <label for="" class="form-label">Bill Of Material (BoM)</label>
+                                                <label for="bom" class="form-label">Bill Of Material (BoM)</label>
                                                 <select class="form-select" name="bom" id="bomSelect">
                                                     <option value="">Pilih BoM</option>
                                                     @foreach ($boms as $item)
@@ -125,7 +125,6 @@
                                         </table>
                                     </div>
 
-
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                                             Tutup
@@ -148,35 +147,29 @@
                 <div class="table-responsive text-nowrap">
                     <div class="card">
                         <div class="table-responsive text-nowrap">
-                            <table class="table table-hover">
+                            <table class="table table-hover" id="manufakturTable">
                                 <thead>
                                     <tr>
                                         <th>Kode Manufaktur</th>
                                         <th>Produk</th>
                                         <th>Jumlah</th>
-                                        <th>Status</th> <!-- Tambahkan kolom status -->
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
-                                <tbody class="table-border-bottom-0">
-                                    @forelse($data as $production)
-                                        <tr>
+                                <tbody>
+                                    @foreach ($data as $production)
+                                        <tr data-id="{{ $production->id }}" class="manufaktur-row">
                                             <td>{{ $production->kode_manufaktur }}</td>
-                                            <td>{{ $production->product ? $production->product->nama_produk : 'Tidak diketahui' }}
-                                            </td>
+                                            <td>{{ $production->product->nama_produk ?? 'Tidak diketahui' }}</td>
                                             <td>{{ $production->jumlah }}</td>
                                             <td>
                                                 <span
-                                                    class="badge rounded-pill
-                                                    {{ $production->status == 'draft' ? 'bg-warning' : 'bg-success' }}">
+                                                    class="badge rounded-pill {{ $production->status == 'draft' ? 'bg-warning' : ($production->status == 'produce' ? 'bg-primary' : 'bg-success') }}">
                                                     {{ ucfirst($production->status) }}
                                                 </span>
-                                            </td> <!-- Tampilkan status dengan badge -->
+                                            </td>
                                         </tr>
-                                    @empty
-                                        <tr id="initialRow">
-                                            <td colspan="4" class="text-center">Data Kosong</td>
-                                        </tr>
-                                    @endforelse
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
@@ -186,14 +179,156 @@
             <!--/ Hoverable Table rows -->
         </div>
     </div>
+
+    <!-- Modal Detail Manufaktur -->
+    <div class="modal fade" id="modalManufakturDetail" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detail Manufaktur</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Kode Manufaktur:</strong> <span id="detailKodeManufaktur"></span></p>
+                    <p><strong>Produk:</strong> <span id="detailProduk"></span></p>
+                    <p><strong>Jumlah:</strong> <span id="detailJumlah"></span></p>
+                    <p><strong>Status:</strong> <span id="detailStatus"></span></p>
+
+                    <!-- Tabel Bahan Baku -->
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Bahan Baku</th>
+                                <th>To Consume</th>
+                                <th>Reserved</th>
+                                <th>Consumed</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailBahanBakuTable">
+                            <tr>
+                                <td colspan="4" class="text-center">Data bahan baku belum tersedia</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-primary" id="btnProduce"
+                        style="display: none;">Produksi</button>
+                    <button type="button" class="btn btn-success" id="btnDone" style="display: none;">Tandai Sudah
+                        Selesai</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('script')
-    <!-- Tambahkan Choices.js -->
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
         $(document).ready(function() {
+            // Event listener untuk klik baris tabel manufaktur
+            $('.manufaktur-row').on('click', function() {
+                var id = $(this).data('id');
+
+                $.ajax({
+                    url: '/manufacture/' + id,
+                    method: 'GET',
+                    success: function(response) {
+                        $('#detailKodeManufaktur').text(response.manufacture.kode_manufaktur);
+                        $('#detailProduk').text(response.manufacture.product.nama_produk);
+                        $('#detailJumlah').text(response.manufacture.jumlah);
+                        $('#detailStatus').text(response.manufacture.status);
+
+                        // Tampilkan tabel bahan baku
+                        var bahanBakuTable = '';
+                        response.bahan_baku.forEach(function(bahan) {
+                            var reserved = bahan.reserved;
+                            var consumed = bahan.consumed;
+                            var colorClass = reserved < consumed ? 'text-danger' :
+                                'text-success'; // Tentukan warna
+
+                            bahanBakuTable += `<tr>
+                    <td>${bahan.nama_bahan}</td>
+                    <td class="${colorClass}">${(bahan.to_consume).toFixed(2)}</td>
+                    <td class="${colorClass}">${reserved.toFixed(2)}</td>
+                    <td class="${colorClass}">${consumed.toFixed(2)}</td>
+                </tr>`;
+                        });
+                        $('#detailBahanBakuTable').html(bahanBakuTable);
+
+                        // Tampilkan atau sembunyikan tombol berdasarkan status
+                        if (response.manufacture.status == 'draft') {
+                            $('#btnProduce').show();
+                            $('#btnDone').hide();
+                        } else if (response.manufacture.status == 'produce') {
+                            $('#btnProduce').hide();
+                            $('#btnDone').show();
+                        } else {
+                            $('#btnProduce').hide();
+                            $('#btnDone').hide();
+                        }
+
+                        $('#modalManufakturDetail').modal('show');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                    }
+                });
+            });
+
+
+            $('.manufaktur-row').on('click', function() {
+                var id = $(this).data('id'); // Ambil ID manufaktur dari baris yang diklik
+                $('#detailKodeManufaktur').data('id',
+                    id); // Simpan ID ini dalam elemen modal atau elemen lainnya
+            });
+
+
+            // Event listener untuk tombol 'Produksi'
+            $('#btnProduce').on('click', function() {
+                var id = $('#detailKodeManufaktur').data(
+                    'id'); // Pastikan ID yang dikirim adalah ID manufaktur yang valid
+
+                $.ajax({
+                    url: '/manufacture/produce/' + id, // Gunakan ID manufaktur
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                    },
+                    success: function(response) {
+                        location.reload(); // Refresh halaman untuk memperbarui status
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                    }
+                });
+            });
+
+
+
+            // Event listener untuk tombol 'Tandai Sudah Selesai'
+            $('#btnDone').on('click', function() {
+                var id = $('#detailKodeManufaktur').data('id'); // Ambil ID manufaktur dari modal
+
+                $.ajax({
+                    url: '/manufacture/done/' + id, // Endpoint untuk mengubah status menjadi 'done'
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                    },
+                    success: function(response) {
+                        location.reload(); // Refresh halaman untuk memperbarui status
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error); // Log error jika ada masalah
+                    }
+                });
+            });
+
+
             // Inisialisasi Choices.js untuk elemen select
             var bomSelect = new Choices('#bomSelect', {
                 searchEnabled: true,
@@ -248,9 +383,9 @@
                     response.bahan_baku.forEach(function(bahan) {
                         var reserved = parseFloat(bahan.jumlah_bahan) || 0; // Reserved (stok tersedia)
                         var toConsumePerUnit = parseFloat(bahan.jumlah_digunakan) ||
-                        0; // To consume per unit produksi
+                            0; // To consume per unit produksi
                         var toConsumeTotal = toConsumePerUnit *
-                        quantity; // Hitung total to consume berdasarkan quantity
+                            quantity; // Hitung total to consume berdasarkan quantity
                         var consumed = toConsumeTotal; // Consumed sekarang adalah total to consume
 
                         // Tambahkan ke total dibutuhkan, stok, dan terkonsumsi
@@ -288,7 +423,7 @@
                     if (hasRed) {
                         $('#alertBahanBaku').removeClass('d-none'); // Tampilkan alert
                         $('#form-bom button[type="submit"]').prop('disabled',
-                        true); // Nonaktifkan tombol submit
+                            true); // Nonaktifkan tombol submit
                     } else {
                         $('#alertBahanBaku').addClass('d-none'); // Sembunyikan alert
                         $('#form-bom button[type="submit"]').prop('disabled', false); // Aktifkan tombol submit

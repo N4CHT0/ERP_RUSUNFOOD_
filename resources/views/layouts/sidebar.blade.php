@@ -68,7 +68,7 @@
         <!-- Produk -->
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons bx bx-layout"></i>
+                <i class="menu-icon tf-icons bx bx-blanket"></i>
                 <div data-i18n="Layouts">Produk</div>
             </a>
 
@@ -89,7 +89,7 @@
         <!-- Manufaktur -->
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons bx bx-layout"></i>
+                <i class="menu-icon tf-icons bx bxs-factory"></i>
                 <div data-i18n="Layouts">Manufaktur</div>
             </a>
 
@@ -128,6 +128,14 @@
             <a href="{{ route('Material.create') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-package"></i>
                 <div data-i18n="Analytics">Buat Bahan Baku</div>
+            </a>
+        </li>
+
+        <!-- Vendor -->
+        <li class="menu-item {{ Route::currentRouteName() == 'Material.create' ? 'active' : '' }}">
+            <a href="{{ route('Material.create') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-buoy"></i>
+                <div data-i18n="Analytics">Tambahkan Vendor</div>
             </a>
         </li>
     </ul>

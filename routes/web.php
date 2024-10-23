@@ -28,3 +28,6 @@ Route::get('/production/cetak-pdf/{id}', [ProductionController::class, 'cetakPDF
 Route::get('/manufacture/', [ManufactureController::class, 'index'])->name('Manufacture.index');
 Route::post('/manufacture/', [ManufactureController::class, 'store'])->name('Manufacture.store');
 Route::get('/get-bom-data/{id}', [ManufactureController::class, 'getBomData']);
+Route::get('/manufacture/{id}', [ManufactureController::class, 'show']);
+Route::post('/manufacture/produce/{id}', [ManufactureController::class, 'produce']);
+Route::post('/manufacture/done/{id}', [ManufactureController::class, 'done']);

@@ -117,4 +117,61 @@ class ManufactureController extends Controller
 
         return redirect()->route('Manufacture.index')->with('success', 'Manufaktur berhasil disimpan, dan stok bahan baku telah diperbarui.');
     }
+
+    public function show($id)
+    {
+        // Ambil manufaktur berdasarkan ID
+        $manufacture = Manufacture::with('product', 'bom')->find($id);
+
+        if (!$manufacture) {
+            return response()->json(['error' => 'Data manufaktur tidak ditemukan'], 404);
+        }
+
+        // Ambil bahan baku berdasarkan BoM yang digunakan
+        $bahan_baku = [];
+        foreach ($manufacture->bom->bahan_digunakan as $bahan) {
+            $material = Material::find($bahan['id_bahan_baku']);
+            if ($material) {
+                $bahan_baku[] = [
+                    'nama_bahan' => $material->nama_bahan,
+                    'to_consume' => $bahan['jumlah_digunakan'] * $manufacture->jumlah,
+                    'reserved' => $material->jumlah_bahan,
+                    'consumed' => $bahan['jumlah_digunakan'] * $manufacture->jumlah
+                ];
+            }
+        }
+
+        return response()->json([
+            'manufacture' => $manufacture,
+            'bahan_baku' => $bahan_baku
+        ]);
+    }
+
+    public function produce($id)
+    {
+        $manufacture = Manufacture::find($id);
+
+        if (!$manufacture) {
+            return response()->json(['error' => 'Data manufaktur tidak ditemukan'], 404);
+        }
+
+        $manufacture->status = 'produce';
+        $manufacture->save();
+
+        return response()->json(['success' => 'Status berhasil diubah menjadi Sedang Di Produksi']);
+    }
+
+    public function done($id)
+    {
+        $manufacture = Manufacture::find($id);
+
+        if (!$manufacture) {
+            return response()->json(['error' => 'Data manufaktur tidak ditemukan'], 404);
+        }
+
+        $manufacture->status = 'done';
+        $manufacture->save();
+
+        return response()->json(['success' => 'Status berhasil diubah menjadi Selesai']);
+    }
 }
