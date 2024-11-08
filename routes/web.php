@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\ManufactureController;
 use App\Http\Controllers\MaterialController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductionController;
+use App\Http\Controllers\VendorController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -31,3 +33,10 @@ Route::get('/get-bom-data/{id}', [ManufactureController::class, 'getBomData']);
 Route::get('/manufacture/{id}', [ManufactureController::class, 'show']);
 Route::post('/manufacture/produce/{id}', [ManufactureController::class, 'produce']);
 Route::post('/manufacture/done/{id}', [ManufactureController::class, 'done']);
+
+// PURCHASING
+Route::get('/daftar-vendor', [VendorController::class, 'index'])->name('Vendor.index');
+Route::post('/vendor', [VendorController::class, 'store'])->name('Vendor.store');
+Route::put('/vendor/{id}', [VendorController::class, 'update'])->name('Vendor.update');
+Route::delete('/vendor/{id}', [VendorController::class, 'destroy'])->name('Vendor.destroy');
+Route::get('/order', [OrderController::class, 'index'])->name('Order.index');
