@@ -39,4 +39,34 @@ Route::get('/daftar-vendor', [VendorController::class, 'index'])->name('Vendor.i
 Route::post('/vendor', [VendorController::class, 'store'])->name('Vendor.store');
 Route::put('/vendor/{id}', [VendorController::class, 'update'])->name('Vendor.update');
 Route::delete('/vendor/{id}', [VendorController::class, 'destroy'])->name('Vendor.destroy');
-Route::get('/order', [OrderController::class, 'index'])->name('Order.index');
+// Route untuk RFQ
+// Route untuk menampilkan daftar orders (index)
+Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+
+// Route untuk menampilkan form pembuatan order baru (create)
+Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
+
+// Route untuk menyimpan order baru (store)
+Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+
+// Route untuk menampilkan detail order tertentu (show)
+Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
+
+// Route untuk menampilkan form edit order tertentu (edit)
+Route::get('/orders/{id}/edit', [OrderController::class, 'edit'])->name('orders.edit');
+
+// Route untuk memperbarui data order tertentu (update)
+Route::put('/orders/{id}', [OrderController::class, 'update'])->name('orders.update');
+
+// Route untuk menghapus order tertentu (destroy)
+Route::delete('/orders/{id}', [OrderController::class, 'destroy'])->name('orders.destroy');
+
+
+// Route untuk mengambil data bahan baku berdasarkan vendor
+Route::get('/vendor/{id}/bahan-baku', [OrderController::class, 'getBahanBaku'])->name('vendor.bahan_baku');
+
+// Route untuk menghasilkan PDF dari order tertentu
+Route::get('/orders/{id}/pdf', [OrderController::class, 'generatePDF'])->name('orders.generatePDF');
+
+// Route untuk menerima order dan mengubah status menjadi pesanan_selesai
+Route::post('/orders/{id}/accept', [OrderController::class, 'acceptOrder'])->name('orders.accept');
