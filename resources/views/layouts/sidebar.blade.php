@@ -96,7 +96,7 @@
             <ul class="menu-sub">
                 <li class="menu-item {{ Route::currentRouteName() == 'orders.index' ? 'active' : 'orders.index' }}">
                     <a href="{{ route('orders.index') }}" class="menu-link">
-                        <div data-i18n="Without menu"> RFQ</div>
+                        <div data-i18n="Without menu"> RFQ & PO</div>
                     </a>
                 </li>
             </ul>

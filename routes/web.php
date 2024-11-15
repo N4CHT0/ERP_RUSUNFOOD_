@@ -70,3 +70,5 @@ Route::get('/orders/{id}/pdf', [OrderController::class, 'generatePDF'])->name('o
 
 // Route untuk menerima order dan mengubah status menjadi pesanan_selesai
 Route::post('/orders/{id}/accept', [OrderController::class, 'acceptOrder'])->name('orders.accept');
+
+Route::post('/orders/{id}/cek-bahan', [OrderController::class, 'processCekBahan'])->name('orders.cek-bahan');

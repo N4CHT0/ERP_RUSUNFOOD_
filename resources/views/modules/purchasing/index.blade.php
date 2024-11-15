@@ -81,7 +81,7 @@
                         <div class="modal-dialog modal-dialog-centered modal-lg">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title">Edit RFQ</h5>
+                                    <h5 class="modal-title">Detail Pesanan</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                 </div>
                                 <form id="form-edit-rfq" method="POST">
@@ -165,6 +165,9 @@
 
                                     </div>
                                     <div class="modal-footer">
+                                        <!-- Button Cek Bahan -->
+                                        <button type="button" class="btn btn-warning" id="cekBahanButton"
+                                            onclick="openCekBahanModal()" style="display: none;">Cek Bahan</button>
                                         <button type="button" class="btn btn-danger"
                                             onclick="deleteOrder()">Hapus</button>
                                         <button type="button" class="btn btn-success" id="acceptOrderButton"
@@ -177,6 +180,30 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Modal Cek Bahan -->
+                    <div class="modal fade" id="modalCekBahan" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Cek Bahan</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form id="form-cek-bahan" method="POST">
+                                    @csrf
+                                    <div class="modal-body" id="cekBahanContainer">
+                                        <!-- Input bahan_diterima akan ditambahkan melalui JavaScript -->
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-outline-secondary"
+                                            data-bs-dismiss="modal">Tutup</button>
+                                        <button type="submit" class="btn btn-primary">Simpan</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -210,6 +237,8 @@
                                             <span class="badge bg-info">Pesanan Diproses</span>
                                         @elseif ($order->status == 'pesanan_selesai')
                                             <span class="badge bg-success">Pesanan Selesai</span>
+                                        @elseif ($order->status == 'menunggu_pembayaran')
+                                            <span class="badge bg-danger">Menunggu Pembayaran</span>
                                         @else
                                             <span class="badge bg-secondary">Status Tidak Diketahui</span>
                                         @endif
@@ -340,31 +369,31 @@
             const tableBody = document.getElementById(tableId);
             const rowCount = tableBody.querySelectorAll('tr').length;
 
+            // Buat opsi combobox dan set opsi yang sesuai dengan bahan yang sudah ada
             let bahanOptions = '<option value="">Pilih Bahan Baku</option>';
             currentAvailableMaterials.forEach(material => {
-                if (!selectedMaterialsEdit.has(material.id) || material.id === bahanId) {
-                    bahanOptions +=
-                        `<option value="${material.id}" ${material.id === bahanId ? 'selected' : ''}>${material.nama_bahan}</option>`;
-                }
+                bahanOptions +=
+                    `<option value="${material.id}" ${material.id == bahanId ? 'selected' : ''}>${material.nama_bahan}</option>`;
             });
 
             const newRow = `
-        <tr>
-            <td>
-                <select class="form-select w-100 bahan-baku-select" name="pemesanan_bahan[${rowCount}][id_bahan_baku]" required>
-                    ${bahanOptions}
-                </select>
-            </td>
-            <td><input type="number" name="pemesanan_bahan[${rowCount}][harga_jual]" class="form-control w-100" value="${hargaJual}" readonly></td>
-            <td><input type="number" name="pemesanan_bahan[${rowCount}][jumlah]" class="form-control w-100" value="${jumlah}" required oninput="updateSubtotalEdit(this)"></td>
-            <td><input type="text" name="pemesanan_bahan[${rowCount}][deskripsi]" class="form-control w-100" value="${deskripsi}"></td>
-            <td class="subtotal">${(hargaJual * jumlah).toFixed(2)}</td>
-            <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRowEdit(this)">Hapus</button></td>
-        </tr>`;
+                <tr>
+                    <td>
+                        <select class="form-select w-100 bahan-baku-select" name="pemesanan_bahan[${rowCount}][id_bahan_baku]" required>
+                            ${bahanOptions}
+                        </select>
+                    </td>
+                    <td><input type="number" name="pemesanan_bahan[${rowCount}][harga_jual]" class="form-control w-100" value="${hargaJual}" readonly></td>
+                    <td><input type="number" name="pemesanan_bahan[${rowCount}][jumlah]" class="form-control w-100" value="${jumlah}" required oninput="updateSubtotalEdit(this)"></td>
+                    <td><input type="text" name="pemesanan_bahan[${rowCount}][deskripsi]" class="form-control w-100" value="${deskripsi}"></td>
+                    <td class="subtotal">${(hargaJual * jumlah).toFixed(2)}</td>
+                    <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRowEdit(this)">Hapus</button></td>
+                </tr>`;
 
             tableBody.insertAdjacentHTML('beforeend', newRow);
             updateTotalEdit();
         }
+
 
         // Fungsi untuk menghitung subtotal setiap row di modal edit
         function updateSubtotalEdit(input) {
@@ -414,37 +443,47 @@
             $('#modalEditRFQ').data('orderId', orderId); // Simpan orderId di modal
             $('#pdfDownloadButton').attr('href', `/orders/${orderId}/pdf`);
 
+            // Ambil data pesanan berdasarkan ID untuk mengisi modal edit
             $.get(`/orders/${orderId}`, function(data) {
-                $('#edit_id_vendor').val(data.id_vendor).trigger('change');
+                $('#edit_id_vendor').val(data.id_vendor).trigger(
+                    'change'); // Set vendor dan panggil 'change' untuk memuat bahan baku
                 $('#edit_tanggal_pemesanan').val(data.tanggal_pemesanan);
                 $('#edit_kode_pemesanan').val(data.kode_pemesanan);
                 $('#edit_nama_pemesan').val(data.nama_pemesan);
                 $('#editPemesananBahanTable').empty();
 
+                // Load bahan baku berdasarkan vendor
+                $.get(`/vendor/${data.id_vendor}/bahan-baku`, function(bahanBakuData) {
+                    currentAvailableMaterials = bahanBakuData;
+
+                    // Tambahkan bahan baku ke tabel edit sesuai data dari server
+                    data.pemesanan_bahan.forEach(bahan => {
+                        addBahanBakuRowEdit(
+                            'editPemesananBahanTable',
+                            bahan.id_bahan_baku,
+                            bahan.nama_bahan,
+                            bahan.harga_jual,
+                            bahan.jumlah,
+                            bahan.deskripsi
+                        );
+                    });
+                });
+
                 // Cek status pesanan dan sembunyikan tombol "Terima Pesanan" dan "Perbarui" jika status adalah pesanan_selesai
                 if (data.status === 'pesanan_selesai') {
                     $('#acceptOrderButton').hide(); // Sembunyikan tombol "Terima Pesanan"
                     $('.btn-primary').hide(); // Sembunyikan tombol "Perbarui"
+                    $('#cekBahanButton').show();
                 } else {
                     $('#acceptOrderButton').show(); // Tampilkan tombol "Terima Pesanan"
                     $('.btn-primary').show(); // Tampilkan tombol "Perbarui"
+                    $('#cekBahanButton').hide();
                 }
-
-                // Tambahkan bahan baku ke tabel edit sesuai data dari server
-                data.pemesanan_bahan.forEach(bahan => {
-                    addBahanBakuRowEdit(
-                        'editPemesananBahanTable',
-                        bahan.id_bahan_baku,
-                        bahan.nama_bahan,
-                        bahan.harga_jual,
-                        bahan.jumlah,
-                        bahan.deskripsi
-                    );
-                });
             }).fail(function() {
                 alert("Gagal mengambil data. Silakan coba lagi.");
             });
         }
+
 
 
 
@@ -530,9 +569,6 @@
             });
         }
 
-
-
-
         // Fungsi untuk memperbarui order (submit form)
         $('#form-edit-rfq').on('submit', function(e) {
             e.preventDefault();
@@ -551,5 +587,35 @@
                 }
             });
         });
+
+        // Fungsi untuk membuka modal Cek Bahan dan mengisi data bahan
+        function openCekBahanModal() {
+            $('#modalEditRFQ').modal('hide'); // Tutup modal edit
+            $('#modalCekBahan').modal('show'); // Buka modal cek bahan
+
+            const orderId = $('#modalEditRFQ').data('orderId');
+
+            // Set action form cek bahan sesuai orderId
+            $('#form-cek-bahan').attr('action', `/orders/${orderId}/cek-bahan`);
+
+            $.get(`/orders/${orderId}`, function(data) {
+                let cekBahanHtml = '';
+
+                data.pemesanan_bahan.forEach((bahan, index) => {
+                    cekBahanHtml += `
+                        <div class="mb-3">
+                            <label class="form-label">Bahan Baku: ${bahan.nama_bahan} (Jumlah Dipesan: ${bahan.jumlah})</label>
+                            <input type="number" name="bahan_diterima[${bahan.id_bahan_baku}]" class="form-control" placeholder="Masukkan jumlah diterima" required>
+                        </div>`;
+                });
+
+                $('#cekBahanContainer').html(cekBahanHtml);
+
+                // Tambahkan tombol submit jika belum ada
+                if (!$('#form-cek-bahan button[type="submit"]').length) {
+                    $('#form-cek-bahan').append('<button type="submit" class="btn btn-primary">Simpan</button>');
+                }
+            });
+        }
     </script>
 @endsection

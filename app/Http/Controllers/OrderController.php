@@ -85,12 +85,25 @@ class OrderController extends Controller
     {
         try {
             $order = Order::findOrFail($id);
-            $order->pemesanan_bahan = json_decode($order->pemesanan_bahan); // Decode JSON data jika tersimpan sebagai string
+            $pemesananBahan = json_decode($order->pemesanan_bahan, true);
+
+            // Loop melalui setiap bahan untuk memastikan 'nama_bahan' ada
+            foreach ($pemesananBahan as &$bahan) {
+                if (empty($bahan['nama_bahan'])) {
+                    $material = Material::find($bahan['id_bahan_baku']);
+                    $bahan['nama_bahan'] = $material ? $material->nama_bahan : 'Tidak Diketahui';
+                }
+            }
+
+            // Menyimpan pemesanan_bahan yang telah diperbarui ke dalam variabel order
+            $order->pemesanan_bahan = $pemesananBahan;
+
             return response()->json($order);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Order not found or data structure error'], 500);
         }
     }
+
 
 
     public function update(Request $request, $id)
@@ -209,5 +222,35 @@ class OrderController extends Controller
         }
 
         return response()->json(['status' => 'success', 'message' => 'Pesanan diterima dan stok bahan diperbarui.']);
+    }
+
+    public function processCekBahan(Request $request, $id)
+    {
+        $order = Order::findOrFail($id);
+        $pemesananBahan = json_decode($order->pemesanan_bahan, true);
+
+        foreach ($pemesananBahan as &$bahan) {
+            $bahanDiterima = $request->input("bahan_diterima.{$bahan['id_bahan_baku']}");
+
+            if ($bahanDiterima < $bahan['jumlah']) {
+                $difference = $bahan['jumlah'] - $bahanDiterima;
+                $bahan['jumlah'] = $bahanDiterima;
+
+                // Update jumlah di tabel bahan_baku
+                $material = Material::find($bahan['id_bahan_baku']);
+                if ($material) {
+                    $material->jumlah_bahan -= $difference;
+                    $material->save();
+                }
+            }
+        }
+
+        // Update pemesanan_bahan dan ubah status menjadi `menunggu_pembayaran`
+        $order->update([
+            'pemesanan_bahan' => json_encode($pemesananBahan),
+            'status' => 'menunggu_pembayaran'
+        ]);
+
+        return redirect()->route('orders.index')->with('success', 'Cek Bahan berhasil diproses dan status diperbarui menjadi menunggu pembayaran.');
     }
 }
