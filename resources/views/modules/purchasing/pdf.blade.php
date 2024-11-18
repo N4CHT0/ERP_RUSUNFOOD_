@@ -13,19 +13,19 @@
             font-family: 'Roboto', sans-serif;
             color: #333;
             line-height: 1.6;
-            background-color: #f9f9f9;
             margin: 0;
             padding: 0;
+            background-color: #f5f5f5;
         }
 
         .container {
-            width: 100%;
             max-width: 850px;
-            margin: 20px auto;
+            margin: 40px auto;
             padding: 20px;
-            background-color: #fff;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         .header {
@@ -34,74 +34,60 @@
         }
 
         .header h1 {
-            font-size: 28px;
-            color: #4a4a4a;
+            font-size: 32px;
+            color: #444;
             margin: 0;
-            padding-bottom: 5px;
+            text-transform: uppercase;
         }
 
         .header p {
-            font-size: 14px;
-            color: #888;
-            margin: 0;
+            font-size: 16px;
+            color: #666;
+            margin: 5px 0;
         }
 
-        /* Info and tables */
+        .divider {
+            border-bottom: 2px solid #eaeaea;
+            margin: 20px 0;
+        }
+
         .info-table,
         .item-table,
         .summary-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin: 20px 0;
             font-size: 14px;
         }
 
-        .info-table td,
-        .item-table th,
-        .item-table td,
-        .summary-table td {
-            padding: 12px 15px;
-        }
-
         .info-table td {
-            color: #555;
+            padding: 10px;
             vertical-align: top;
-        }
-
-        .section-title {
-            font-size: 16px;
-            font-weight: 500;
-            color: #333;
-            padding: 10px 0;
-            margin-top: 20px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        /* Item table styles */
-        .item-table th {
-            background-color: #f3f3f3;
             color: #555;
-            font-weight: 500;
-            border-bottom: 2px solid #e0e0e0;
-            text-align: left;
+        }
+
+        .info-table strong {
+            color: #333;
+        }
+
+        .item-table th,
+        .item-table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+
+        .item-table th {
+            background-color: #f8f8f8;
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #555;
         }
 
         .item-table td {
-            border-bottom: 1px solid #f0f0f0;
+            background-color: #fff;
             color: #555;
         }
 
-        .item-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .item-table {
-            margin-top: 10px;
-            border-radius: 6px;
-            overflow: hidden;
-        }
-
-        /* Summary table styles */
         .summary-table td {
             padding: 12px 15px;
             font-size: 14px;
@@ -111,60 +97,71 @@
         .summary-table .label {
             text-align: right;
             color: #666;
+            font-weight: 500;
         }
 
         .summary-table .value {
+            text-align: right;
             font-weight: 700;
             color: #333;
         }
 
-        .summary-table tr:nth-child(2) td {
-            background-color: #f9f9f9;
-        }
-
         .summary-table tr:last-child td {
-            background-color: #f3f3f3;
             font-size: 16px;
-            color: #333;
+            font-weight: bold;
+            background-color: #f8f8f8;
         }
 
-        /* Additional styling for badges */
-        .badge {
-            display: inline-block;
-            padding: 5px 10px;
+        /* Footer styles */
+        .footer {
+            text-align: center;
+            margin-top: 20px;
             font-size: 12px;
-            color: #fff;
-            border-radius: 5px;
-            font-weight: 500;
+            color: #999;
         }
 
-        .badge-info {
-            background-color: #5bc0de;
+        .badge {
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+            border-radius: 4px;
         }
 
         .badge-success {
-            background-color: #5cb85c;
+            background-color: #28a745;
+        }
+
+        .badge-info {
+            background-color: #17a2b8;
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <!-- Header Section -->
+        <!-- Header -->
         <div class="header">
-            <h1>Invoice RFQ</h1>
+            <h1>Invoice</h1>
             <p>Kode RFQ: {{ $order->kode_pemesanan }}</p>
         </div>
 
+        <!-- Divider -->
+        <div class="divider"></div>
+
         <!-- Order Information -->
-        <div class="section-title">Informasi Pesanan</div>
         <table class="info-table">
             <tr>
-                <td style="width: 50%;"><strong>Nama Pemesan:</strong> {{ $order->nama_pemesan }}</td>
-                <td><strong>Vendor:</strong> {{ $order->vendor->nama }}</td>
-            </tr>
-            <tr>
-                <td><strong>Tanggal Pemesanan:</strong> {{ $order->tanggal_pemesanan }}</td>
+                <td>
+                    <strong>Nama Pemesan:</strong> {{ $order->nama_pemesan }}<br>
+                    <strong>Tanggal Pemesanan:</strong> {{ $order->tanggal_pemesanan }}
+                </td>
+                <td>
+                    <strong>Vendor:</strong> {{ $order->vendor->nama }}<br>
+                    <strong>Alamat:</strong> {{ $order->vendor->alamat }}<br>
+                    <strong>Email:</strong> {{ $order->vendor->email }}<br>
+                    <strong>No Telpon:</strong> {{ $order->vendor->no_telepon }}
+                </td>
                 <td>
                     <strong>Status:</strong>
                     <span class="badge {{ $order->status == 'pesanan_selesai' ? 'badge-success' : 'badge-info' }}">
@@ -172,18 +169,12 @@
                     </span>
                 </td>
             </tr>
-            <tr>
-                <td></td>
-                <td>
-                    <strong>Alamat:</strong> {{ $order->vendor->alamat }}<br>
-                    <strong>Email:</strong> {{ $order->vendor->email }}<br>
-                    <strong>No Telpon:</strong> {{ $order->vendor->no_telepon }}
-                </td>
-            </tr>
         </table>
 
-        <!-- Order Items Table -->
-        <div class="section-title">Detail Bahan Baku</div>
+        <!-- Divider -->
+        <div class="divider"></div>
+
+        <!-- Items Table -->
         <table class="item-table">
             <thead>
                 <tr>
@@ -197,7 +188,7 @@
             <tbody>
                 @foreach (json_decode($order->pemesanan_bahan, true) as $bahan)
                     <tr>
-                        <td>{{ $bahan['nama_bahan'] }}</td>
+                        <td>{{ $bahan['nama_bahan'] ?? 'Nama bahan tidak tersedia' }}</td>
                         <td>Rp. {{ number_format($bahan['harga_jual'], 2, ',', '.') }}</td>
                         <td>{{ $bahan['jumlah'] }}</td>
                         <td>{{ $bahan['deskripsi'] }}</td>
@@ -208,7 +199,6 @@
         </table>
 
         <!-- Summary Table -->
-        <div class="section-title">Ringkasan Pembayaran</div>
         <table class="summary-table">
             <tr>
                 <td class="label">Subtotal:</td>
@@ -219,10 +209,16 @@
                 <td class="value">Rp. {{ number_format($order->pajak, 2, ',', '.') }}</td>
             </tr>
             <tr>
-                <td class="label"><strong>Total:</strong></td>
-                <td class="value"><strong>Rp. {{ number_format($order->total, 2, ',', '.') }}</strong></td>
+                <td class="label">Total:</td>
+                <td class="value">Rp. {{ number_format($order->total, 2, ',', '.') }}</td>
             </tr>
         </table>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Dokumen ini dibuat secara otomatis. Jika Anda memiliki pertanyaan, hubungi {{ $order->vendor->email }}.
+            </p>
+        </div>
     </div>
 </body>
 

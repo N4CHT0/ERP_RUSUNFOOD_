@@ -48,10 +48,12 @@ class OrderController extends Controller
             $bahanSubtotal = $hargaJual * $jumlah;
             $subtotal += $bahanSubtotal;
 
+            $material = Material::find($bahan['id_bahan_baku']); // Ambil data bahan baku
+
             // Tambahkan data bahan ini ke array pemesananBahan
             $pemesananBahan[] = [
                 'id_bahan_baku' => $bahan['id_bahan_baku'],
-                'nama_bahan' => $bahan['nama_bahan'] ?? '',
+                'nama_bahan' => $material ? $material->nama_bahan : 'Tidak Diketahui',
                 'harga_jual' => $hargaJual,
                 'jumlah' => $jumlah,
                 'deskripsi' => $bahan['deskripsi'] ?? '',
@@ -124,9 +126,11 @@ class OrderController extends Controller
         foreach ($request->pemesanan_bahan as $bahan) {
             $bahanSubtotal = $bahan['harga_jual'] * $bahan['jumlah'];
             $subtotal += $bahanSubtotal;
+            $material = Material::find($bahan['id_bahan_baku']); // Ambil data bahan baku
+
             $pemesananBahan[] = [
                 'id_bahan_baku' => $bahan['id_bahan_baku'],
-                'nama_bahan' => $bahan['nama_bahan'],
+                'nama_bahan' => $material ? $material->nama_bahan : 'Tidak Diketahui',
                 'harga_jual' => $bahan['harga_jual'],
                 'jumlah' => $bahan['jumlah'],
                 'deskripsi' => $bahan['deskripsi'],
@@ -170,31 +174,37 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
         $pemesananBahan = json_decode($order->pemesanan_bahan, true);
 
-        // Loop melalui setiap bahan untuk memastikan 'nama_bahan' diambil dari database jika tidak ada
+        // Loop untuk memastikan nama_bahan diambil dari tabel Material
         foreach ($pemesananBahan as &$bahan) {
-            if (empty($bahan['nama_bahan'])) {
-                $material = Material::find($bahan['id_bahan_baku']);
-                $bahan['nama_bahan'] = $material ? $material->nama_bahan : 'Tidak Diketahui';
-            }
+            $material = Material::find($bahan['id_bahan_baku']); // Ambil data bahan baku dari Material
+            $bahan['nama_bahan'] = $material ? $material->nama_bahan : 'Tidak Diketahui';
         }
 
-        // Hitung subtotal dan total
+        // Perbarui pemesanan_bahan dalam objek order (opsional)
+        $order->update([
+            'pemesanan_bahan' => json_encode($pemesananBahan),
+        ]);
+
+        // Hitung ulang subtotal dan total
         $subtotal = array_reduce($pemesananBahan, function ($carry, $bahan) {
             return $carry + $bahan['subtotal'];
         }, 0);
-
         $pajak = $subtotal * 0.1;
         $total = $subtotal + $pajak;
 
-        // Update data bahan ke dalam order dan tampilkan di view PDF
+        // Buat PDF dengan data yang diperbarui
         $pdf = PDF::loadView('modules.purchasing.pdf', compact('order', 'pemesananBahan', 'subtotal', 'pajak', 'total'));
         $fileName = 'RFQ_' . $order->kode_pemesanan . '.pdf';
+
+        // Simpan PDF ke storage (opsional)
         Storage::put("pdf/{$fileName}", $pdf->output());
 
+        // Simpan nama file ke dalam database
         $order->update(['dokumen' => $fileName]);
 
         return $pdf->download($fileName);
     }
+
 
 
 
