@@ -72,3 +72,5 @@ Route::get('/orders/{id}/pdf', [OrderController::class, 'generatePDF'])->name('o
 Route::post('/orders/{id}/accept', [OrderController::class, 'acceptOrder'])->name('orders.accept');
 
 Route::post('/orders/{id}/cek-bahan', [OrderController::class, 'processCekBahan'])->name('orders.cek-bahan');
+
+Route::post('/orders/{id}/payment', [OrderController::class, 'processPayment'])->name('orders.payment');

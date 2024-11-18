@@ -243,6 +243,9 @@ class OrderController extends Controller
                     $material->save();
                 }
             }
+
+            // Update jumlah_barang dengan bahan_diterima
+            $bahan['jumlah_barang'] = $bahanDiterima;
         }
 
         // Update pemesanan_bahan dan ubah status menjadi `menunggu_pembayaran`
@@ -252,5 +255,28 @@ class OrderController extends Controller
         ]);
 
         return redirect()->route('orders.index')->with('success', 'Cek Bahan berhasil diproses dan status diperbarui menjadi menunggu pembayaran.');
+    }
+
+    public function processPayment(Request $request, $id)
+    {
+        $order = Order::findOrFail($id);
+
+        // Validasi input
+        $request->validate([
+            'metode_pembayaran' => 'required|in:Tunai,Bank',
+            'tanggal_pembayaran' => 'required|date',
+        ]);
+
+        // Perbarui status pesanan dan simpan data pembayaran
+        $order->update([
+            'metode_pembayaran' => $request->metode_pembayaran,
+            'tanggal_pembayaran' => $request->tanggal_pembayaran,
+            'status' => 'tagihan_dibuat',
+        ]);
+
+        // Generate PDF setelah pembayaran selesai
+        $this->generatePDF($id);
+
+        return redirect()->route('orders.index')->with('success', 'Pembayaran berhasil diproses dan status pesanan diperbarui menjadi lunas.');
     }
 }

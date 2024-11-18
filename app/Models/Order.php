@@ -21,6 +21,8 @@ class Order extends Model
         'tanggal_pemesanan',
         'total',
         'pemesanan_bahan',
+        'metode_pembayaran',
+        'tanggal_pembayaran',
         'dokumen',
     ];
 

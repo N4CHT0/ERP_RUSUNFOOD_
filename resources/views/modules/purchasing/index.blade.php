@@ -165,6 +165,9 @@
 
                                     </div>
                                     <div class="modal-footer">
+                                        <button type="button" class="btn btn-outline-success" id="paymentButton"
+                                            onclick="openPaymentModalFromEdit()" style="display: none;">Proses
+                                            Pembayaran</button>
                                         <!-- Button Cek Bahan -->
                                         <button type="button" class="btn btn-warning" id="cekBahanButton"
                                             onclick="openCekBahanModal()" style="display: none;">Cek Bahan</button>
@@ -174,7 +177,7 @@
                                             onclick="acceptOrder()">Terima Pesanan</button>
                                         <a id="pdfDownloadButton" href="#" class="btn btn-secondary"
                                             target="_blank">Cetak</a>
-                                        <button type="submit" class="btn btn-primary">Perbarui</button>
+                                        <button type="submit" class="btn btn-primary edit">Perbarui</button>
                                     </div>
                                 </form>
                             </div>
@@ -197,12 +200,48 @@
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-outline-secondary"
                                             data-bs-dismiss="modal">Tutup</button>
-                                        <button type="submit" class="btn btn-primary">Simpan</button>
+                                        <button type="submit" class="btn btn-primary cek">Simpan</button>
                                     </div>
                                 </form>
                             </div>
                         </div>
                     </div>
+
+                    <div class="modal fade" id="modalPayment" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Proses Pembayaran</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form id="form-payment" method="POST">
+                                    @csrf
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label for="metode_pembayaran" class="form-label">Metode Pembayaran</label>
+                                            <select name="metode_pembayaran" id="metode_pembayaran" class="form-select"
+                                                required>
+                                                <option value="">Pilih Metode</option>
+                                                <option value="Tunai">Tunai</option>
+                                                <option value="Bank">Bank</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="tanggal_pembayaran" class="form-label">Tanggal Pembayaran</label>
+                                            <input type="date" name="tanggal_pembayaran" id="tanggal_pembayaran"
+                                                class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Tutup</button>
+                                        <button type="submit" class="btn btn-primary tagihan">Proses</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
 
                 </div>
             </div>
@@ -236,7 +275,9 @@
                                         @if ($order->status == 'pesanan_diproses')
                                             <span class="badge bg-info">Pesanan Diproses</span>
                                         @elseif ($order->status == 'pesanan_selesai')
-                                            <span class="badge bg-success">Pesanan Selesai</span>
+                                            <span class="badge bg-warning">Pesanan Selesai</span>
+                                        @elseif ($order->status == 'tagihan_dibuat')
+                                            <span class="badge bg-success">Tagihan Dibuat</span>
                                         @elseif ($order->status == 'menunggu_pembayaran')
                                             <span class="badge bg-danger">Menunggu Pembayaran</span>
                                         @else
@@ -424,7 +465,6 @@
         }
 
         // Fungsi untuk menghapus row di modal edit
-        // Fungsi untuk menghapus row di modal edit
         function removeRowEdit(button) {
             const row = button.closest('tr');
             const bahanId = parseInt(row.querySelector('.bahan-baku-select').value);
@@ -469,16 +509,31 @@
                     });
                 });
 
-                // Cek status pesanan dan sembunyikan tombol "Terima Pesanan" dan "Perbarui" jika status adalah pesanan_selesai
+                // Cek status pesanan dan atur visibilitas tombol berdasarkan status
                 if (data.status === 'pesanan_selesai') {
                     $('#acceptOrderButton').hide(); // Sembunyikan tombol "Terima Pesanan"
-                    $('.btn-primary').hide(); // Sembunyikan tombol "Perbarui"
-                    $('#cekBahanButton').show();
+                    $('.btn-primary.edit').hide(); // Sembunyikan tombol "Perbarui"
+                    $('#cekBahanButton').show(); // Sembunyikan tombol "Cek Bahan"
+                    $('#paymentButton').hide(); // Sembunyikan tombol "Proses Pembayaran"
+                } else if (data.status === 'menunggu_pembayaran') {
+                    $('#acceptOrderButton').hide(); // Sembunyikan tombol "Terima Pesanan"
+                    $('.btn-primary.edit').hide(); // Sembunyikan tombol "Perbarui"
+                    $('#cekBahanButton').hide(); // Sembunyikan tombol "Cek Bahan"
+                    $('#paymentButton').show(); // Tampilkan tombol "Proses Pembayaran"
+                } else if (data.status === 'tagihan_dibuat') {
+                    $('#acceptOrderButton').hide(); // Sembunyikan tombol "Terima Pesanan"
+                    $('.btn-primary.edit').hide(); // Sembunyikan tombol "Perbarui"
+                    $('#cekBahanButton').hide(); // Sembunyikan tombol "Cek Bahan"
+                    $('#paymentButton').hide(); // Sembunyikan tombol "Proses Pembayaran"
                 } else {
+                    // Kondisi default untuk status lainnya
                     $('#acceptOrderButton').show(); // Tampilkan tombol "Terima Pesanan"
-                    $('.btn-primary').show(); // Tampilkan tombol "Perbarui"
-                    $('#cekBahanButton').hide();
+                    $('.btn-primary.edit').show(); // Tampilkan tombol "Perbarui"
+                    $('#cekBahanButton').hide(); // Sembunyikan tombol "Cek Bahan"
+                    $('#paymentButton').hide(); // Sembunyikan tombol "Proses Pembayaran"
                 }
+
+
             }).fail(function() {
                 alert("Gagal mengambil data. Silakan coba lagi.");
             });
@@ -616,6 +671,16 @@
                     $('#form-cek-bahan').append('<button type="submit" class="btn btn-primary">Simpan</button>');
                 }
             });
+        }
+
+        function openPaymentModalFromEdit() {
+            $('#modalEditRFQ').modal('hide'); // Tutup modal edit
+            $('#modalPayment').modal('show'); // Buka modal pembayaran
+
+            const orderId = $('#modalEditRFQ').data('orderId'); // Dapatkan order ID dari modal edit
+
+            // Set action form pembayaran sesuai orderId
+            $('#form-payment').attr('action', `/orders/${orderId}/payment`);
         }
     </script>
 @endsection
